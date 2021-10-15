@@ -1,0 +1,13 @@
+flask
+gunicorn
+gevent
+alembic
+pydantic
+Flask-Cors
+psycopg2
+psycogreen
+requests
+json-logging
+python-dotenv
+Flask-pydantic
+sqlalchemy
