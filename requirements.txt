@@ -11,3 +11,5 @@ json-logging
 python-dotenv
 Flask-pydantic
 sqlalchemy
+pyjwt[crypto]
+flask-request-id-header
