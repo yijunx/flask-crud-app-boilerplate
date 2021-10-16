@@ -7,7 +7,7 @@ from uuid import uuid4
 from app.schemas.item import ItemCreate, Item
 from app.schemas.user import User
 from datetime import datetime, timezone
-from app.repo.util import translate_query_pagination_to_limit_and_offset
+from app.repo.util import translate_query_pagination
 
 
 def create(db: Session, item_create: ItemCreate, creator: User) -> models.Item:
@@ -53,9 +53,8 @@ def get_all(
         )
 
     total = query.count()
-    limit, offset, paging = translate_query_pagination_to_limit_and_offset(
-        query_pagination=query_pagination,
-        total=total
+    limit, offset, paging = translate_query_pagination(
+        query_pagination=query_pagination, total=total
     )
 
     db_items = query.limit(limit).offset(offset)

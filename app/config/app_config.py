@@ -12,8 +12,6 @@ class Settings(BaseSettings):
     DEFAULT_PAGE_SIZE: int
 
 
-
-
 class ProdConfig(Settings):
     pass
 
