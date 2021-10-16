@@ -9,6 +9,10 @@ class Settings(BaseSettings):
     SERVICE_VERSION: str
     DATABASE_URI: str
 
+    DEFAULT_PAGE_SIZE: int
+
+
+
 
 class ProdConfig(Settings):
     pass

@@ -4,9 +4,10 @@ from app.schemas.pagination import QueryPagination, ResponsePagination
 from app.db.models import models
 from sqlalchemy.orm import Session
 from uuid import uuid4
-from app.schemas.item import ItemCreate, Item, ItemWithPagination
+from app.schemas.item import ItemCreate, Item
 from app.schemas.user import User
 from datetime import datetime, timezone
+from app.repo.util import translate_query_pagination_to_limit_and_offset
 
 
 def create(db: Session, item_create: ItemCreate, creator: User) -> models.Item:
@@ -41,8 +42,23 @@ def get(db: Session, item_id: str) -> models.Item:
 
 
 def get_all(
-    db: Session, item_id: str, query_pagination: QueryPagination, is_admin: bool
+    db: Session, query_pagination: QueryPagination
 ) -> Tuple[List[models.Item], ResponsePagination]:
     # here is admin is decided by the casbin rules in the service level...
-    
-    pass
+    query = db.query(models.Item)
+
+    if query_pagination.name:
+        query = query.filter(
+            models.Item.name.ilike(f"%{query_pagination.name}%"),
+        )
+
+    total = query.count()
+    limit, offset, paging = translate_query_pagination_to_limit_and_offset(
+        query_pagination=query_pagination,
+        total=total
+    )
+
+    db_items = query.limit(limit).offset(offset)
+    paging.page_size = len(db_items)
+
+    return db_items, paging
