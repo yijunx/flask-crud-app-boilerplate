@@ -3,7 +3,7 @@ from app.db.database import SessionLocal
 from app.schemas.item import Item, ItemCreate, ItemWithPagination, ItemPatch
 from app.schemas.pagination import QueryPagination
 from app.schemas.user import User
-from app.repo import item as itemRepo
+import app.repo.item as itemRepo
 
 
 @contextmanager
@@ -40,6 +40,11 @@ def list_items(query_pagination: QueryPagination) -> ItemWithPagination:
         db_items, paging = itemRepo.get_all(db=db, query_pagination=query_pagination)
         items = [Item.from_orm(x) for x in db_items]
     return ItemWithPagination(data=items, paging=paging)
+
+
+def delete_item(item_id: str) -> None:
+    with get_db() as db:
+        itemRepo.delete(db=db, item_id=item_id)
 
 
 def clean_up() -> None:
