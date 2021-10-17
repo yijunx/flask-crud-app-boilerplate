@@ -10,6 +10,7 @@ class Settings(BaseSettings):
     DATABASE_URI: str
 
     DEFAULT_PAGE_SIZE: int
+    CORS_ALLOWED_ORIGINS: str
 
 
 class ProdConfig(Settings):

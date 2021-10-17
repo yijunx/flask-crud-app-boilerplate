@@ -6,14 +6,16 @@ from app.util.app_logging import get_logger, init_logger
 from app.blueprints.item import bp as itemBp
 from app.blueprints.interntal import bp as internalBp
 from app.util.response_util import create_response
+from app.config.app_config import conf
 
-logger = get_logger()
+
+logger = get_logger(__name__)
 
 app = Flask(__name__)
 init_logger(app=app)
 # app.json_encoder = some custom json encoder... (to deal with some datetime issues)
 app.config["REQUEST_ID_UNIQUE_VALUE_PREFIX"] = ""
-CORS(app, resources={r"/api/*": {"origins": app.config["CORS_ALLOWED_ORIGINS"]}})
+CORS(app, resources={r"/api/*": {"origins": conf.CORS_ALLOWED_ORIGINS}})
 
 
 # blue prints

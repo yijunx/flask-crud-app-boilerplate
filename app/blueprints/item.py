@@ -9,7 +9,7 @@ from app.util.process_request import get_user_info_from_request
 from app.exceptions.item import ItemDoesNotExist
 
 
-bp = Blueprint("internal", __name__, url_prefix="/api/items")
+bp = Blueprint("item", __name__, url_prefix="/api/items")
 logger = get_logger(__name__)
 
 
@@ -28,7 +28,7 @@ def post_item(body: ItemCreate):
 
 
 @bp.route("/<item_id>", methods=["GET"])
-def delete_item(item_id: str):
+def get_item(item_id: str):
     _ = get_user_info_from_request(request=request)
     # check casbin here...
     try:

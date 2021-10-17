@@ -3,7 +3,7 @@ from app.util.response_util import create_response
 from app.util.app_logging import get_logger
 
 
-bp = Blueprint("internal", __name__, url_prefix="/internal")
+bp = Blueprint("internal", __name__, url_prefix="")
 logger = get_logger(__name__)
 
 

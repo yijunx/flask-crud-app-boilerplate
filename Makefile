@@ -1,8 +1,8 @@
 migrate:
-	@bash scripts/migrate.sh
+	@bash scripts/migration.sh
 
 up:
-	@bash scripts/migrate.sh
+	@bash scripts/migration.sh
 	@bash scripts/start.sh
 
 test:
