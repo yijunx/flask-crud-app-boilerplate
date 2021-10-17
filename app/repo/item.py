@@ -25,6 +25,7 @@ def create(db: Session, item_create: ItemCreate, creator: User) -> models.Item:
     try:
         db.flush()
     except IntegrityError:
+        db.rollback()
         raise ItemNameIsAlreadyThere(item_name=item_create.name)
     return db_item
 

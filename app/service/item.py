@@ -21,7 +21,6 @@ def get_db():
 
 
 def create_item(item_create: ItemCreate, user: User) -> Item:
-
     with get_db() as db:
         db_item = itemRepo.create(db=db, item_create=item_create, creator=user)
         item = Item.from_orm(db_item)

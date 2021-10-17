@@ -6,5 +6,5 @@ up:
 	@bash scripts/start.sh
 
 test:
-	@bash scripts/migrate.sh
+	@bash scripts/migration.sh
 	@bash scripts/test.sh
