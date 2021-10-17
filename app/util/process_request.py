@@ -15,9 +15,7 @@ def decode_token(token: str):
 
 
 def get_token_from_cookie(headers: dict) -> str:
-    cookie = headers.get("Cookie", None)
-    print("HEADERS ARE:")
-    print(headers)
+    cookie: str = headers.get("Cookie", None)
     if cookie is None:
         return None
     raisins: List[str] = cookie.split("; ")
@@ -29,7 +27,7 @@ def get_token_from_cookie(headers: dict) -> str:
 
 
 def get_token_from_authorization_header(headers: dict) -> str:
-    bearer_auth = headers.get("Authorization", None)
+    bearer_auth: str = headers.get("Authorization", None)
     if bearer_auth is None:
         return None
     token = bearer_auth.split(" ")[1]

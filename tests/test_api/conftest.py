@@ -8,7 +8,7 @@ from flask.testing import FlaskClient
 def client(user_dict) -> FlaskClient:
     token = jwt.encode(payload=user_dict, key="secret")
     with app.test_client() as c:
-        c.set_cookie('localhost', 'token', token)
+        c.set_cookie("localhost", "token", token)
         yield c
 
 

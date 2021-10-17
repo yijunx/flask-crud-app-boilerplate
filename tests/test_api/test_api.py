@@ -3,6 +3,7 @@ from app.schemas.user import User
 from app.schemas.response import StandardResponse
 from flask.testing import FlaskClient
 
+
 ITEM_ID = ""
 
 
@@ -13,7 +14,9 @@ def test_create_item(
     user: User,
     headers_with_authorization: dict,
 ):
-    r = client.post("/api/items", json=item_create_dict, headers=headers_with_authorization)
+    r = client.post(
+        "/api/items", json=item_create_dict, headers=headers_with_authorization
+    )
     print(r.get_json())
     item = Item(**r.get_json()["response"])
     global ITEM_ID

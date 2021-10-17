@@ -1,6 +1,5 @@
-from flask import Flask, Response
+from flask import Flask
 from flask.json import JSONEncoder
-from flask.helpers import make_response
 from flask_request_id_header.middleware import RequestID
 from flask_cors import CORS
 from app.util.app_logging import get_logger, init_logger
@@ -32,6 +31,7 @@ class CustomJSONEncoder(JSONEncoder):
 
 
 app.config["REQUEST_ID_UNIQUE_VALUE_PREFIX"] = ""
+RequestID(app)
 CORS(app, resources={r"/api/*": {"origins": conf.CORS_ALLOWED_ORIGINS}})
 
 app.json_encoder = CustomJSONEncoder
@@ -40,17 +40,17 @@ app.register_blueprint(itemBp)
 app.register_blueprint(internalBp)
 
 
-@app.after_request
-def modify_flask_pydantic_response(response: Response):
-    if (
-        response.status_code == 400
-        and response.is_json
-        and "validation_error" in response.json
-    ):
-        logger.info(response.json)
-        message = "The problem is in the validation"
-        return create_response(message=message, status_code=400)
-    return response
+# @app.after_request
+# def modify_flask_pydantic_response(response: Response):
+#     if (
+#         response.status_code == 400
+#         and response.is_json
+#         and "validation_error" in response.json
+#     ):
+#         logger.info(response.json)
+#         message = "The problem is in the validation"
+#         return create_response(message=message, status_code=400)
+#     return response
 
 
 @app.errorhandler(500)
