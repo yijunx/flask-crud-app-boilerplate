@@ -1,4 +1,5 @@
 from flask import Flask, Response
+from flask.json import JSONEncoder
 from flask.helpers import make_response
 from flask_request_id_header.middleware import RequestID
 from flask_cors import CORS
@@ -7,6 +8,7 @@ from app.blueprints.item import bp as itemBp
 from app.blueprints.interntal import bp as internalBp
 from app.util.response_util import create_response
 from app.config.app_config import conf
+from datetime import datetime
 
 
 logger = get_logger(__name__)
@@ -14,11 +16,26 @@ logger = get_logger(__name__)
 app = Flask(__name__)
 init_logger(app=app)
 # app.json_encoder = some custom json encoder... (to deal with some datetime issues)
+
+
+class CustomJSONEncoder(JSONEncoder):
+    def default(self, obj):
+        try:
+            if isinstance(obj, datetime):
+                return obj.isoformat()
+            iterable = iter(obj)
+        except TypeError:
+            pass
+        else:
+            return list(iterable)
+        return JSONEncoder.default(self, obj)
+
+
 app.config["REQUEST_ID_UNIQUE_VALUE_PREFIX"] = ""
 CORS(app, resources={r"/api/*": {"origins": conf.CORS_ALLOWED_ORIGINS}})
 
+app.json_encoder = CustomJSONEncoder
 
-# blue prints
 app.register_blueprint(itemBp)
 app.register_blueprint(internalBp)
 

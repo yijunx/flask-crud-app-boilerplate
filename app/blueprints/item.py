@@ -21,6 +21,7 @@ def list_items(query: QueryPagination):
 
 
 @bp.route("", methods=["POST"])
+@validate()
 def post_item(body: ItemCreate):
     user = get_user_info_from_request(request=request)
     r = itemService.create_item(item_create=body, user=user)
@@ -44,5 +45,5 @@ def get_item(item_id: str):
 def delete_item(item_id: str):
     _ = get_user_info_from_request(request=request)
     # check casbin here...
-    r = itemService.delete_item(item_id=item_id)
-    return create_response(response=r)
+    _ = itemService.delete_item(item_id=item_id)
+    return create_response(message="item deleted")

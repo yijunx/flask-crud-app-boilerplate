@@ -4,7 +4,7 @@ from app.schemas.pagination import QueryPagination, ResponsePagination
 from app.db.models import models
 from sqlalchemy.orm import Session
 from uuid import uuid4
-from app.schemas.item import ItemCreate, Item
+from app.schemas.item import ItemCreate
 from app.schemas.user import User
 from datetime import datetime, timezone
 from app.repo.util import translate_query_pagination

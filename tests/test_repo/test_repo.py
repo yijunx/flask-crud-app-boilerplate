@@ -28,7 +28,9 @@ def test_cannot_get_item(db: Session):
         _ = itemRepo.get(db=db, item_id="wrong id")
 
 
-def test_cannot_create_item_with_used_name(db: Session, item_create: ItemCreate, user: User):
+def test_cannot_create_item_with_used_name(
+    db: Session, item_create: ItemCreate, user: User
+):
     with pytest.raises(ItemNameIsAlreadyThere):
         _ = itemRepo.create(db=db, item_create=item_create, creator=user)
 
@@ -44,4 +46,3 @@ def test_delete_item(db: Session):
 def test_delete_item_again(db: Session):
     with pytest.raises(ItemDoesNotExist):
         itemRepo.delete(db=db, item_id=ITEM_ID)
-    
