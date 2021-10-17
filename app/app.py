@@ -51,5 +51,3 @@ app.register_blueprint(internalBp)
 #         message = "The problem is in the validation"
 #         return create_response(message=message, status_code=400)
 #     return response
-
-

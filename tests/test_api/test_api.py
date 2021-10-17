@@ -44,9 +44,17 @@ def test_get_item_with_wrong_id(
     headers_with_authorization: dict,
 ):
     r = client.get(f"/api/items/wrong_id", headers=headers_with_authorization)
-    print(r.get_json())
     standard_response = StandardResponse(**r.get_json())
     assert standard_response.success == False
+
+
+def test_list_items(
+    client: FlaskClient,
+    headers_with_authorization: dict,
+):
+    r = client.get(f"/api/items", headers=headers_with_authorization)
+    items_with_pagination = ItemWithPagination(**r.get_json()["response"])
+    assert items_with_pagination.data[0].id == ITEM_ID
 
 
 def test_delete_item(client: FlaskClient, headers_with_authorization: dict):

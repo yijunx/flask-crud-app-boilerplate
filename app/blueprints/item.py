@@ -27,8 +27,10 @@ def post_item(body: ItemCreate):
     user = get_user_info_from_request(request=request)
     try:
         r = itemService.create_item(item_create=body, user=user)
-    except (ItemNameIsAlreadyThere, ) as e:
-        return create_response(status_code=e.status_code, message=e.message, success=False)
+    except (ItemNameIsAlreadyThere,) as e:
+        return create_response(
+            status_code=e.status_code, message=e.message, success=False
+        )
     except Exception as e:
         logger.error(e, exc_info=True)
         return create_response(status_code=500, message=str(e), success=False)

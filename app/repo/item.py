@@ -64,7 +64,9 @@ def get_all(
         query_pagination=query_pagination, total=total
     )
 
-    db_items = query.limit(limit).offset(offset).all()
+    db_items = (
+        query.order_by(models.Item.created_at.desc()).limit(limit).offset(offset).all()
+    )
     paging.page_size = len(db_items)
 
     return db_items, paging
