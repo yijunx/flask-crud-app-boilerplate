@@ -53,7 +53,3 @@ app.register_blueprint(internalBp)
 #     return response
 
 
-@app.errorhandler(500)
-def unhandled_internal_server_error(err):
-    logger.error(err, exc_info=True)
-    return create_response(message=err, status_code=500, success=False)

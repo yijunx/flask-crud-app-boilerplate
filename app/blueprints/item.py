@@ -6,7 +6,7 @@ from app.util.response_util import create_response
 import app.service.item as itemService
 from app.util.app_logging import get_logger
 from app.util.process_request import get_user_info_from_request
-from app.exceptions.item import ItemDoesNotExist
+from app.exceptions.item import ItemDoesNotExist, ItemNameIsAlreadyThere
 
 
 bp = Blueprint("item", __name__, url_prefix="/api/items")
@@ -14,6 +14,7 @@ logger = get_logger(__name__)
 
 
 @bp.route("", methods=["GET"])
+@validate()
 def list_items(query: QueryPagination):
     _ = get_user_info_from_request(request=request)
     r = itemService.list_items(query_pagination=query)
@@ -24,7 +25,13 @@ def list_items(query: QueryPagination):
 @validate()
 def post_item(body: ItemCreate):
     user = get_user_info_from_request(request=request)
-    r = itemService.create_item(item_create=body, user=user)
+    try:
+        r = itemService.create_item(item_create=body, user=user)
+    except (ItemNameIsAlreadyThere, ) as e:
+        return create_response(status_code=e.status_code, message=e.message, success=False)
+    except Exception as e:
+        logger.error(e, exc_info=True)
+        return create_response(status_code=500, message=str(e), success=False)
     return create_response(response=r)
 
 
