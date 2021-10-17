@@ -8,6 +8,8 @@ from app.schemas.item import ItemCreate, Item
 from app.schemas.user import User
 from datetime import datetime, timezone
 from app.repo.util import translate_query_pagination
+from app.exceptions.item import ItemDoesNotExist, ItemNameIsAlreadyThere
+from sqlalchemy.exc import IntegrityError
 
 
 def create(db: Session, item_create: ItemCreate, creator: User) -> models.Item:
@@ -20,6 +22,10 @@ def create(db: Session, item_create: ItemCreate, creator: User) -> models.Item:
         created_by_name=creator.name,
     )
     db.add(db_item)
+    try:
+        db.flush()
+    except IntegrityError:
+        raise ItemNameIsAlreadyThere(item_name=item_create.name)
     return db_item
 
 
@@ -30,14 +36,14 @@ def delete_all(db: Session) -> None:
 def delete(db: Session, item_id: str) -> None:
     db_item = db.query(models.Item).filter(models.Item.id == item_id).first()
     if not db_item:
-        raise
+        raise ItemDoesNotExist(item_id=item_id)
     db.delete(db_item)
 
 
 def get(db: Session, item_id: str) -> models.Item:
     db_item = db.query(models.Item).filter(models.Item.id == item_id).first()
     if not db_item:
-        raise
+        raise ItemDoesNotExist(item_id=item_id)
     return db_item
 
 

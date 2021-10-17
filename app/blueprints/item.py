@@ -6,6 +6,7 @@ from app.util.response_util import create_response
 import app.service.item as itemService
 from app.util.app_logging import get_logger
 from app.util.process_request import get_user_info_from_request
+from app.exceptions.item import ItemDoesNotExist
 
 
 bp = Blueprint("internal", __name__, url_prefix="/api/items")
@@ -30,7 +31,12 @@ def post_item(body: ItemCreate):
 def delete_item(item_id: str):
     _ = get_user_info_from_request(request=request)
     # check casbin here...
-    r = itemService.get_item(item_id=item_id)
+    try:
+        r = itemService.get_item(item_id=item_id)
+    except (ItemDoesNotExist,) as e:
+        return create_response(
+            success=False, message=e.message, status_code=e.status_code
+        )
     return create_response(response=r)
 
 
@@ -40,10 +46,3 @@ def delete_item(item_id: str):
     # check casbin here...
     r = itemService.delete_item(item_id=item_id)
     return create_response(response=r)
-
-
-
-
-
-
-

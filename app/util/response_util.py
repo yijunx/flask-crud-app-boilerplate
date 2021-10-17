@@ -8,7 +8,7 @@ def create_response(
     response: BaseModel = None,
     success: bool = True,
     message: str = None,
-    status: int = 200,
+    status_code: int = 200,
     headers: Dict = None,
     cookies: Dict = None,
     cookies_to_delete: List[str] = None,
@@ -17,7 +17,7 @@ def create_response(
         jsonify(
             StandardResponse(success=success, response=response, message=message).dict()
         ),
-        status,
+        status_code,
     )
     if headers:
         for k, v in headers.items():
