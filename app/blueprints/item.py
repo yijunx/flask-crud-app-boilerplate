@@ -54,7 +54,8 @@ def get_item(item_id: str):
 
 @bp.route("/<item_id>", methods=["DELETE"])
 def delete_item(item_id: str):
-    _ = get_user_info_from_request(request=request)
+    user = get_user_info_from_request(request=request)
     # check casbin here...
-    _ = itemService.delete_item(item_id=item_id)
+    # always need to pass the user because need to ask casbin for auth
+    _ = itemService.delete_item(item_id=item_id, user=user)
     return create_response(message="item deleted")
