@@ -6,7 +6,11 @@ from app.schemas.item import Item, ItemCreate, ItemWithPagination, ItemPatch
 from app.schemas.pagination import QueryPagination
 from app.schemas.user import User
 import app.repo.item as itemRepo
-from app.casbin.rbac import casbin_enforcer
+from app.casbin.rbac import create_casbin_enforcer
+from app.casbin.role_definition import SpecificResourceRightsEnum, SpecificResourceActionsEnum
+
+
+casbin_enforcer = create_casbin_enforcer()
 
 
 @contextmanager
@@ -30,12 +34,14 @@ def create_item(item_create: ItemCreate, user: User) -> Item:
         item = Item.from_orm(db_item)
 
         # the owner can do anything to the resource
-        casbin_enforcer.add_policy(user.id, item.id, "get")
+        casbin_enforcer.add_policy(
+            user.id, item.id, SpecificResourceRightsEnum.own.name
+        )
     return item
 
 
 def get_item(item_id: str, user: User) -> Item:
-    if casbin_enforcer.enforce(user.id, item_id, "get"):
+    if casbin_enforcer.enforce(user.id, item_id, SpecificResourceActionsEnum.get.name):
         with get_db() as db:
             db_item = itemRepo.get(db=db, item_id=item_id)
             item = Item.from_orm(db_item)
@@ -51,9 +57,12 @@ def list_items(query_pagination: QueryPagination) -> ItemWithPagination:
     return ItemWithPagination(data=items, paging=paging)
 
 
-def delete_item(item_id: str) -> None:
-    with get_db() as db:
-        itemRepo.delete(db=db, item_id=item_id)
+def delete_item(item_id: str, user: User) -> None:
+    if casbin_enforcer.enforce(user.id, item_id, SpecificResourceActionsEnum.get.name):
+        with get_db() as db:
+            itemRepo.delete(db=db, item_id=item_id)
+    else:
+        return {"no access": "bro"}
 
 
 def clean_up() -> None:

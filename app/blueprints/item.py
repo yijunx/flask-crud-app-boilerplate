@@ -39,7 +39,7 @@ def post_item(body: ItemCreate):
 
 @bp.route("/<item_id>", methods=["GET"])
 def get_item(item_id: str):
-    print(request.method) # GET
+    print(request.method)  # GET
     print(request.path)  # /api/items/2f2d325e-1cb3-46d3-be06-07e6243643df
     user = get_user_info_from_request(request=request)
     # check casbin here...

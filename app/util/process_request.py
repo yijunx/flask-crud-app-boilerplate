@@ -4,6 +4,7 @@ from app.schemas.user import User
 from flask import Request, abort
 from datetime import datetime, timedelta, timezone
 from typing import List
+from flask import Request
 
 
 def decode_token(token: str):
@@ -14,20 +15,13 @@ def decode_token(token: str):
     return data
 
 
-def get_token_from_cookie(headers: dict) -> str:
-    cookie: str = headers.get("Cookie", None)
-    if cookie is None:
-        return None
-    raisins: List[str] = cookie.split("; ")
-    token = None
-    for r in raisins:
-        if r.startswith("token="):
-            token = r.split("=")[1]
+def get_token_from_cookie(request: Request) -> str:
+    token: str = request.cookies.get("token", None)
     return token
 
 
-def get_token_from_authorization_header(headers: dict) -> str:
-    bearer_auth: str = headers.get("Authorization", None)
+def get_token_from_authorization_header(request: Request) -> str:
+    bearer_auth: str = request.headers.get("Authorization", None)
     if bearer_auth is None:
         return None
     token = bearer_auth.split(" ")[1]
@@ -40,7 +34,7 @@ def get_user_info_from_request(request: Request) -> User:
     react frontend cannot get it. and chrome will only add the token
     in the cookie accompanying the request sent to the server.
     """
-    token = get_token_from_cookie(request.headers)
+    token = get_token_from_cookie(request)
     if token is None:
         print("TOKEN IS NONE")
         abort(status=401)
