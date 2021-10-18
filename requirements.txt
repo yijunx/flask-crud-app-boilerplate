@@ -13,3 +13,5 @@ Flask-pydantic
 sqlalchemy
 pyjwt[crypto]
 flask-request-id-header
+casbin
+casbin_sqlalchemy_adapter

@@ -1,9 +1,12 @@
 from contextlib import contextmanager
+
+from casbin import enforcer
 from app.db.database import SessionLocal
 from app.schemas.item import Item, ItemCreate, ItemWithPagination, ItemPatch
 from app.schemas.pagination import QueryPagination
 from app.schemas.user import User
 import app.repo.item as itemRepo
+from app.casbin.rbac import casbin_enforcer
 
 
 @contextmanager
@@ -21,17 +24,24 @@ def get_db():
 
 
 def create_item(item_create: ItemCreate, user: User) -> Item:
+    # here it means every body can post
     with get_db() as db:
         db_item = itemRepo.create(db=db, item_create=item_create, creator=user)
         item = Item.from_orm(db_item)
+
+        # the owner can do anything to the resource
+        casbin_enforcer.add_policy(user.id, item.id, "get")
     return item
 
 
-def get_item(item_id: str) -> Item:
-    with get_db() as db:
-        db_item = itemRepo.get(db=db, item_id=item_id)
-        item = Item.from_orm(db_item)
-    return item
+def get_item(item_id: str, user: User) -> Item:
+    if casbin_enforcer.enforce(user.id, item_id, "get"):
+        with get_db() as db:
+            db_item = itemRepo.get(db=db, item_id=item_id)
+            item = Item.from_orm(db_item)
+        return item
+    else:
+        return {"no access": "bro"}
 
 
 def list_items(query_pagination: QueryPagination) -> ItemWithPagination:
