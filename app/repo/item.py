@@ -3,7 +3,7 @@ from sqlalchemy.sql.expression import and_, or_
 from app.schemas.pagination import QueryPagination, ResponsePagination
 from app.db.models import models
 from sqlalchemy.orm import Session
-from uuid import uuid4
+# from uuid import uuid4
 from app.schemas.item import ItemCreate
 from app.schemas.user import User
 from datetime import datetime, timezone
@@ -14,7 +14,7 @@ from sqlalchemy.exc import IntegrityError
 
 def create(db: Session, item_create: ItemCreate, creator: User) -> models.Item:
     db_item = models.Item(
-        id=str(uuid4()),
+        # id=str(uuid4()), [let db create the id for us]
         name=item_create.name,
         description=item_create.description,
         created_at=datetime.now(timezone.utc),

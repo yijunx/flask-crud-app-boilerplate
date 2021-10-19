@@ -11,6 +11,7 @@ class Settings(BaseSettings):
 
     DEFAULT_PAGE_SIZE: int
     CORS_ALLOWED_ORIGINS: str
+    ADMIN_ROLE_ID: str
 
 
 class ProdConfig(Settings):

@@ -4,8 +4,7 @@ from flask_request_id_header.middleware import RequestID
 from flask_cors import CORS
 from app.util.app_logging import get_logger, init_logger
 from app.blueprints.item import bp as itemBp
-from app.blueprints.interntal import bp as internalBp
-from app.util.response_util import create_response
+from app.blueprints.internal import bp as internalBp
 from app.config.app_config import conf
 from datetime import datetime
 

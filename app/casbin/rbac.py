@@ -25,8 +25,11 @@ def create_casbin_enforcer():
 
     casbin_enforcer.add_function("actions_mapping", actions_mapping)
     # add admin role, only admin can create
-    # casbin_enforcer.add_policy("admin_role_id", RESOURCE, ResourceActionsEnum.create.name)
-    # casbin_enforcer.add_grouping_policy("admin_user_id", "admin_role_id")
+    # well we cannot add policy this way because there are additional columns
+    # casbin_enforcer.add_policy("admin-user-id", RESOURCE, ResourceActionsEnum.create.name)
+    # casbin_enforcer.add_grouping_policy("admin-user-id", "admin-role-id")
+
+
     return casbin_enforcer
 
 
