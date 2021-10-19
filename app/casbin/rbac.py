@@ -1,7 +1,10 @@
 import casbin_sqlalchemy_adapter
 import casbin
 from app.config.app_config import conf
-from app.casbin.role_definition import resource_right_action_mapping, ResourceActionsEnum
+from app.casbin.role_definition import (
+    resource_right_action_mapping,
+    ResourceActionsEnum,
+)
 
 
 RESOURCE = "/items"
@@ -28,7 +31,6 @@ def create_casbin_enforcer():
     # well we cannot add policy this way because there are additional columns
     # casbin_enforcer.add_policy("admin-user-id", RESOURCE, ResourceActionsEnum.create.name)
     # casbin_enforcer.add_grouping_policy("admin-user-id", "admin-role-id")
-
 
     return casbin_enforcer
 

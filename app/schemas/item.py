@@ -1,7 +1,8 @@
 from pydantic import BaseModel
 from app.schemas.pagination import ResponsePagination
 from datetime import datetime
-from typing import List
+from typing import List, Optional
+from app.casbin.role_definition import SpecificResourceRightsEnum
 
 
 class ItemCreate(BaseModel):
@@ -23,6 +24,18 @@ class Item(ItemCreate):
         orm_mode = True
 
 
-class ItemWithPagination(BaseModel):
+class ItemWithPaging(BaseModel):
     data: List[Item]
+    paging: ResponsePagination
+
+
+class UsersItemRight(BaseModel):
+    """resource_id's relation to a specific user"""
+
+    user_id: str
+    right: Optional[SpecificResourceRightsEnum]  # own / edit / view
+
+
+class UsersItemRightWithPaging(BaseModel):
+    data: List[UsersItemRight]
     paging: ResponsePagination

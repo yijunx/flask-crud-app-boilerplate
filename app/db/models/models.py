@@ -25,4 +25,3 @@ class CasbinRule(Base):
     v5 = Column(String, nullable=True)
     created_at = Column(DateTime, nullable=False)
     created_by = Column(String, nullable=False)
-
