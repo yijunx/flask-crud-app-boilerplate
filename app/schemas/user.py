@@ -11,13 +11,13 @@ class User(BaseModel):
     email: str
 
 
-class ItemsUserRight(BaseModel):
-    """user's relation to a specific resource id"""
+class UsersItemRight(BaseModel):
+    """resource_id's relation to a specific user"""
 
-    resource_id: str
+    user_id: str
     right: Optional[SpecificResourceRightsEnum]  # own / edit / view
 
 
-class ItemsUserRightWithPaging(BaseModel):
-    data: List[ItemsUserRight]
+class UsersItemRightWithPaging(BaseModel):
+    data: List[UsersItemRight]
     paging: ResponsePagination

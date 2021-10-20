@@ -2,7 +2,7 @@ from enum import Enum, auto
 from pydantic import BaseModel
 
 
-class SpecificResourceRightsEnum(Enum):
+class SpecificResourceRightsEnum(str, Enum):
     """one user can only be one of the below"""
 
     view = "view"  # user is viewer
@@ -10,14 +10,14 @@ class SpecificResourceRightsEnum(Enum):
     own = "own"  # user is owner
 
 
-class ResourceActionsEnum(Enum):
+class ResourceActionsEnum(str, Enum):
     """actions to happen on resource/ without id"""
 
     get_all = "get_all"
     create = "create"
 
 
-class SpecificResourceActionsEnum(Enum):
+class SpecificResourceActionsEnum(str, Enum):
     """these are the actions to happen on a resource/resource_id"""
 
     get = "get"
@@ -31,21 +31,21 @@ class SpecificResourceActionsEnum(Enum):
 # this is dynamic
 resource_right_action_mapping: dict = {
     SpecificResourceRightsEnum.view: {
-        SpecificResourceActionsEnum.get.name,
-        SpecificResourceActionsEnum.download.name,
+        SpecificResourceActionsEnum.get,
+        SpecificResourceActionsEnum.download,
     },
-    SpecificResourceRightsEnum.edit.name: {
-        SpecificResourceActionsEnum.get.name,
-        SpecificResourceActionsEnum.download.name,
-        SpecificResourceActionsEnum.patch.name,
+    SpecificResourceRightsEnum.edit: {
+        SpecificResourceActionsEnum.get,
+        SpecificResourceActionsEnum.download,
+        SpecificResourceActionsEnum.patch,
     },
-    SpecificResourceRightsEnum.own.name: {
-        SpecificResourceActionsEnum.get.name,
-        SpecificResourceActionsEnum.download.name,
-        SpecificResourceActionsEnum.patch.name,
-        SpecificResourceActionsEnum.share.name,
-        SpecificResourceActionsEnum.unshare.name,
-        SpecificResourceActionsEnum.delete.name,
+    SpecificResourceRightsEnum.own: {
+        SpecificResourceActionsEnum.get,
+        SpecificResourceActionsEnum.download,
+        SpecificResourceActionsEnum.patch,
+        SpecificResourceActionsEnum.share,
+        SpecificResourceActionsEnum.unshare,
+        SpecificResourceActionsEnum.delete,
     },
 }
 

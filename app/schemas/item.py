@@ -29,13 +29,13 @@ class ItemWithPaging(BaseModel):
     paging: ResponsePagination
 
 
-class UsersItemRight(BaseModel):
-    """resource_id's relation to a specific user"""
+class ItemsUserRight(BaseModel):
+    """user's relation to a specific resource id"""
 
-    user_id: str
+    resource_id: str
     right: Optional[SpecificResourceRightsEnum]  # own / edit / view
 
 
-class UsersItemRightWithPaging(BaseModel):
-    data: List[UsersItemRight]
+class ItemsUserRightWithPaging(BaseModel):
+    data: List[ItemsUserRight]
     paging: ResponsePagination

@@ -6,7 +6,10 @@ from app.config.app_config import conf
 def translate_query_pagination(
     query_pagination: QueryPagination, total: int
 ) -> Tuple[int, int, ResponsePagination]:
-    # returns limit and offset and ResponsePagination with pagesize undesided
+    """
+    returns limit: int and offset: int and paging: ResponsePagination
+    with pagesize undesided
+    """
     limit: int
     offset: int
     if query_pagination.size == -1:
