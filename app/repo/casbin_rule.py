@@ -122,10 +122,24 @@ def update_resouce_specific_policy(db: Session):
 
 def delete_resource(db: Session, items_user_right: ItemsUserRight) -> None:
     query = db.query(models.CasbinRule).filter(
+        and_(
         models.CasbinRule.ptype == PolicyTypeEnum.p,
-        models.CasbinRule.v1 == items_user_right.resource_id,
+        models.CasbinRule.v1 == items_user_right.resource_id)
     )
     if items_user_right.right:
         query.filter(models.CasbinRule.v2 == items_user_right.right)
     db_items = query.all()
     db.delete(db_items)
+
+
+def delete_casbin_policy(db: Session, casbin_policy: CasbinPolicy) -> None:
+    query = db.query(models.CasbinRule).filter(
+        and_(
+        models.CasbinRule.ptype == PolicyTypeEnum.p,
+        models.CasbinRule.v1 == casbin_policy)
+    )
+    db_items = query.all()
+    if db_items:
+        db.delete(db_items)
+    else:
+        raise PolicyDoesNotExist(item_id=item_id)

@@ -9,6 +9,7 @@ class User(BaseModel):
     id: str
     name: str  # maybe only first name from google id token
     email: str
+    is_admin: bool = False
 
 
 class UsersItemRight(BaseModel):

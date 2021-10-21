@@ -19,18 +19,18 @@ from datetime import datetime, timezone
 RESOURCE = "/items"
 
 
-# @contextmanager
-# def get_db():
-#     session = SessionLocal()
-#     try:
-#         yield session
-#         session.commit()
-#     except:
-#         session.rollback()
-#         # can roll other things back here
-#         raise
-#     finally:
-#         session.close()
+@contextmanager
+def get_db():
+    session = SessionLocal()
+    try:
+        yield session
+        session.commit()
+    except:
+        session.rollback()
+        # can roll other things back here
+        raise
+    finally:
+        session.close()
 
 
 def create_casbin_enforcer():
@@ -38,6 +38,7 @@ def create_casbin_enforcer():
     casbin_enforcer = casbin.Enforcer("app/casbin/model.conf", adapter)
     # probably need to come from configurations?
     # now added a function here to
+    print("creating casbin enforcer")
 
     def actions_mapping(action: str, resource_right: str) -> bool:
         """
@@ -56,6 +57,19 @@ def create_casbin_enforcer():
     # casbin_enforcer.add_grouping_policy("admin-user-id", "admin-role-id")
 
     return casbin_enforcer
+
+
+casbin_enforcer = create_casbin_enforcer()
+
+
+def is_admin(user: User):
+    with get_db() as db:
+        is_admin = any(
+            x
+            for x in casbinruleRepo.get_role_ids_of_user(db=db, user_id=user.id)
+            if x.v1 == conf.ADMIN_ROLE_ID
+        )
+    return is_admin
 
 
 def construct_role_name(item_id: str) -> str:
