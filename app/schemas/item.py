@@ -30,7 +30,7 @@ class ItemWithPaging(BaseModel):
 
 
 class ItemsUserRight(BaseModel):
-    """user's relation to a specific resource id"""
+    """used for select all policies for a given item"""
 
     resource_id: str
     right: Optional[SpecificResourceRightsEnum]  # own / edit / view

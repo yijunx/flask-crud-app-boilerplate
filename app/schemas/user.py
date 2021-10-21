@@ -12,7 +12,7 @@ class User(BaseModel):
 
 
 class UsersItemRight(BaseModel):
-    """resource_id's relation to a specific user"""
+    """used for select all policies for a given user"""
 
     user_id: str
     right: Optional[SpecificResourceRightsEnum]  # own / edit / view
@@ -21,3 +21,10 @@ class UsersItemRight(BaseModel):
 class UsersItemRightWithPaging(BaseModel):
     data: List[UsersItemRight]
     paging: ResponsePagination
+
+
+class UserShare(BaseModel):
+    """the schema for the payload to share/unshare a user"""
+
+    user_id: str
+    right: SpecificResourceRightsEnum

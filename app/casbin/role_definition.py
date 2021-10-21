@@ -1,5 +1,11 @@
-from enum import Enum, auto
-from pydantic import BaseModel
+from enum import Enum
+
+
+class PolicyTypeEnum(str, Enum):
+    """p for policy, g for grouping"""
+
+    p = "p"
+    g = "g"
 
 
 class SpecificResourceRightsEnum(str, Enum):

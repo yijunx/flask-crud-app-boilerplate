@@ -2,11 +2,7 @@ from pydantic import BaseModel
 from enum import Enum
 from typing import Optional
 from datetime import datetime
-
-
-class PolicyTypeEnum(str, Enum):
-    p = "p"
-    g = "g"
+from app.casbin.role_definition import PolicyTypeEnum
 
 
 class CasbinPolicy(BaseModel):
@@ -22,3 +18,10 @@ class CasbinPolicy(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+class CasbinPolicyPatch(BaseModel):
+    ptype: PolicyTypeEnum
+    v0: Optional[str]
+    v1: Optional[str]
+    v2: Optional[str]

@@ -1,13 +1,36 @@
 import casbin_sqlalchemy_adapter
 import casbin
+from pydantic.utils import path_type
 from app.config.app_config import conf
 from app.casbin.role_definition import (
+    SpecificResourceRightsEnum,
     resource_right_action_mapping,
     ResourceActionsEnum,
 )
+import app.repo.casbin_rule as casbinruleRepo
+from app.db.database import SessionLocal
+from contextlib import contextmanager
+from app.schemas.casbin_rule import CasbinPolicy
+
+from app.schemas.user import User
+from datetime import datetime, timezone
 
 
 RESOURCE = "/items"
+
+
+# @contextmanager
+# def get_db():
+#     session = SessionLocal()
+#     try:
+#         yield session
+#         session.commit()
+#     except:
+#         session.rollback()
+#         # can roll other things back here
+#         raise
+#     finally:
+#         session.close()
 
 
 def create_casbin_enforcer():

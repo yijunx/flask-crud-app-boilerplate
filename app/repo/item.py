@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 # from uuid import uuid4
 from app.schemas.item import ItemCreate
 from app.schemas.user import User
+from uuid import uuid4
 from datetime import datetime, timezone
 from app.repo.util import translate_query_pagination
 from app.exceptions.item import ItemDoesNotExist, ItemNameIsAlreadyThere
@@ -15,7 +16,7 @@ from sqlalchemy.exc import IntegrityError
 
 def create(db: Session, item_create: ItemCreate, creator: User) -> models.Item:
     db_item = models.Item(
-        # id=str(uuid4()), [let db create the id for us]
+        id=str(uuid4()),  # [let db create the id for us]
         name=item_create.name,
         description=item_create.description,
         created_at=datetime.now(timezone.utc),
@@ -50,11 +51,14 @@ def get(db: Session, item_id: str) -> models.Item:
 
 
 def get_all(
-    db: Session, query_pagination: QueryPagination
+    db: Session, query_pagination: QueryPagination, item_ids: List[str] = None
 ) -> Tuple[List[models.Item], ResponsePagination]:
     # here is admin is decided by the casbin rules in the service level...
+
     query = db.query(models.Item)
 
+    if item_ids:
+        query = query.filter(models.Item.id.in_(item_ids))
     if query_pagination.name:
         query = query.filter(
             models.Item.name.ilike(f"%{query_pagination.name}%"),
@@ -69,5 +73,4 @@ def get_all(
         query.order_by(models.Item.created_at.desc()).limit(limit).offset(offset).all()
     )
     paging.page_size = len(db_items)
-
     return db_items, paging

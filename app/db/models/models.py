@@ -1,4 +1,5 @@
 from sqlalchemy import Column, String, DateTime
+from sqlalchemy.sql.schema import UniqueConstraint
 from sqlalchemy.sql.sqltypes import BigInteger
 from .base import Base
 
@@ -15,6 +16,7 @@ class Item(Base):
 
 class CasbinRule(Base):
     __tablename__ = "casbin_rule"
+    __table_args__ = UniqueConstraint("v0", "v1", name="_v0_v1_uc")
     id = Column(BigInteger, autoincrement=True, primary_key=True, index=True)
     ptype = Column(String, nullable=False)
     v0 = Column(String, nullable=True)
