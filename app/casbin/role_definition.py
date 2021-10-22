@@ -9,7 +9,7 @@ class PolicyTypeEnum(str, Enum):
 
 
 class SpecificResourceRightsEnum(str, Enum):
-    """one user can only be one of the below"""
+    """one user of one resource can only be one of the below"""
 
     view = "view"  # user is viewer
     edit = "edit"  # user is editor
