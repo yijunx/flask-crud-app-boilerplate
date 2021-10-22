@@ -5,6 +5,7 @@ from flask_cors import CORS
 from app.util.app_logging import get_logger, init_logger
 from app.blueprints.item import bp as itemBp
 from app.blueprints.internal import bp as internalBp
+from app.blueprints.rbac import bp as rbacBp
 from app.config.app_config import conf
 from datetime import datetime
 
@@ -37,6 +38,7 @@ app.json_encoder = CustomJSONEncoder
 
 app.register_blueprint(itemBp)
 app.register_blueprint(internalBp)
+app.register_blueprint(rbacBp)
 
 
 # @app.after_request

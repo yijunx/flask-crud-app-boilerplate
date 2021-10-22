@@ -59,3 +59,42 @@ def delete_item(item_id: str):
     # always need to pass the user because need to ask casbin for auth
     _ = itemService.delete_item(item_id=item_id, user=user)
     return create_response(message="item deleted")
+
+
+@bp.route("/<item_id>/sharees", methods=["POST"])
+def share_item(item_id: str):
+    user = get_user_info_from_request(request=request)
+    # check casbin here...
+    # always need to pass the user because need to ask casbin for auth
+    _ = itemService.delete_item(item_id=item_id, user=user)
+    return create_response(message="item deleted")
+
+
+@bp.route("/<item_id>/sharees", methods=["GET"])
+def list_shares(item_id: str):
+    user = get_user_info_from_request(request=request)
+    # check casbin here...
+    # always need to pass the user because need to ask casbin for auth
+    _ = itemService.delete_item(item_id=item_id, user=user)
+    return create_response(message="item deleted")
+
+
+@bp.route("/<item_id>/sharees/<sharee_id>", methods=["DELETE"])
+def unshare_item(item_id: str, sharee_id: str):
+    user = get_user_info_from_request(request=request)
+    # check casbin here...
+    # always need to pass the user because need to ask casbin for auth
+    _ = itemService.delete_item(item_id=item_id, user=user)
+    return create_response(message="item deleted")
+
+
+@bp.route("/<item_id>/sharees/<sharee_id>", methods=["PATCH"])
+def update_item_sharing_info(item_id: str, sharee_id: str):
+    user = get_user_info_from_request(request=request)
+    # check casbin here...
+    # always need to pass the user because need to ask casbin for auth
+    _ = itemService.delete_item(item_id=item_id, user=user)
+    return create_response(message="item deleted")
+
+
+
