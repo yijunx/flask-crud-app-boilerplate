@@ -10,6 +10,3 @@ logger = get_logger(__name__)
 @bp.route("/liveness", methods=["GET"])
 def liveness_probe():
     return {"am i ok": "yes"}
-
-
-

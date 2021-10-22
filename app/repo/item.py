@@ -57,7 +57,7 @@ def get_all(
 
     query = db.query(models.Item)
 
-    if item_ids:
+    if item_ids is not None:  # cos it could be an empty list!!
         query = query.filter(models.Item.id.in_(item_ids))
     if query_pagination.name:
         query = query.filter(

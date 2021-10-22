@@ -62,7 +62,7 @@ def list_items(query_pagination: QueryPagination, user: User) -> ItemWithPaging:
                 resource_name=conf.RESOURCE_NAME,
                 is_admin=False,
             )
-            item_ids = [get_item_id(resource_id = p.v1) for p in policies]
+            item_ids = [get_item_id(resource_id=p.v1) for p in policies]
             db_items, paging = itemRepo.get_all(
                 db=db, query_pagination=query_pagination, item_ids=item_ids
             )
@@ -86,8 +86,11 @@ def get_item(item_id: str, user: User) -> Item:
 def delete_item(item_id: str, user: User) -> None:
     with get_db() as db:
         itemRepo.delete(db=db, item_id=item_id)
-        casbinruleRepo.delete_resource(
-            db=db, items_user_right=ItemsUserRight(resource_id=get_resource_id(item_id=item_id))
+        casbinruleRepo.delete_policies_by_resource_id(
+            db=db,
+            items_user_right=ItemsUserRight(
+                resource_id=get_resource_id(item_id=item_id)
+            ),
         )
 
 

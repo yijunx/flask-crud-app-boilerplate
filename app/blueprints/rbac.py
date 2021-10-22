@@ -3,7 +3,7 @@ from app.util.response_util import create_response
 from app.util.app_logging import get_logger
 
 
-bp = Blueprint("internal", __name__, url_prefix="/internal/rbac")
+bp = Blueprint("rbac", __name__, url_prefix="/internal/rbac")
 logger = get_logger(__name__)
 
 
@@ -28,7 +28,3 @@ def add_admin_user():
 def delete_admin_user():
     # need to check if this is comming from a user admin..
     return "not yet"
-
-
-
-

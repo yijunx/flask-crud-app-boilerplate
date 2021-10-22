@@ -1,7 +1,9 @@
 from flask import Blueprint, request
 from flask_pydantic import validate
+from app.exceptions.rbac import NotAuthorized
 from app.schemas.item import ItemCreate
 from app.schemas.pagination import QueryPagination
+from app.schemas.user import UserShare
 from app.util.response_util import create_response
 import app.service.item as itemService
 from app.util.app_logging import get_logger
@@ -16,8 +18,8 @@ logger = get_logger(__name__)
 @bp.route("", methods=["GET"])
 @validate()
 def list_items(query: QueryPagination):
-    _ = get_user_info_from_request(request=request)
-    r = itemService.list_items(query_pagination=query)
+    user = get_user_info_from_request(request=request)
+    r = itemService.list_items(query_pagination=query, user=user)
     return create_response(response=r)
 
 
@@ -32,23 +34,23 @@ def post_item(body: ItemCreate):
             status_code=e.status_code, message=e.message, success=False
         )
     except Exception as e:
-        logger.error(e, exc_info=True)
         return create_response(status_code=500, message=str(e), success=False)
     return create_response(response=r)
 
 
 @bp.route("/<item_id>", methods=["GET"])
 def get_item(item_id: str):
-    print(request.method)  # GET
-    print(request.path)  # /api/items/2f2d325e-1cb3-46d3-be06-07e6243643df
     user = get_user_info_from_request(request=request)
     # check casbin here...
     try:
         r = itemService.get_item(item_id=item_id, user=user)
-    except (ItemDoesNotExist,) as e:
+    except (ItemDoesNotExist, NotAuthorized) as e:
         return create_response(
             success=False, message=e.message, status_code=e.status_code
         )
+    except Exception as e:
+        logger.debug(e, exc_info=True)
+        return create_response(success=False, message=str(e), status_code=500)
     return create_response(response=r)
 
 
@@ -57,16 +59,33 @@ def delete_item(item_id: str):
     user = get_user_info_from_request(request=request)
     # check casbin here...
     # always need to pass the user because need to ask casbin for auth
-    _ = itemService.delete_item(item_id=item_id, user=user)
+    try:
+        itemService.delete_item(item_id=item_id, user=user)
+    except (ItemDoesNotExist, NotAuthorized) as e:
+        return create_response(
+            success=False, message=e.message, status_code=e.status_code
+        )
+    except Exception as e:
+        logger.debug(e, exc_info=True)
+        return create_response(success=False, message=str(e), status_code=500)
     return create_response(message="item deleted")
 
 
 @bp.route("/<item_id>/sharees", methods=["POST"])
-def share_item(item_id: str):
+@validate
+def share_item(item_id: str, body: UserShare):
     user = get_user_info_from_request(request=request)
     # check casbin here...
     # always need to pass the user because need to ask casbin for auth
-    _ = itemService.delete_item(item_id=item_id, user=user)
+    try:
+        itemService.share_item(item_id=item_id, user=user, user_share=body)
+    except (ItemDoesNotExist, NotAuthorized) as e:
+        return create_response(
+            success=False, message=e.message, status_code=e.status_code
+        )
+    except Exception as e:
+        logger.error(e, exc_info=True)
+        return create_response(success=False, message=str(e), status_code=500)
     return create_response(message="item deleted")
 
 
@@ -95,6 +114,3 @@ def update_item_sharing_info(item_id: str, sharee_id: str):
     # always need to pass the user because need to ask casbin for auth
     _ = itemService.delete_item(item_id=item_id, user=user)
     return create_response(message="item deleted")
-
-
-

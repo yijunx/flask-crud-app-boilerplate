@@ -26,6 +26,7 @@ def create(db: Session, casbin_policy: CasbinPolicy) -> models.Item:
         created_at=casbin_policy.created_at,
         created_by=casbin_policy.created_by,
     )
+    db.add(db_item)
     try:
         db.flush()
     except IntegrityError:
@@ -121,7 +122,10 @@ def get_role_ids_of_user(db: Session, user_id: str):
     return db_items
 
 
-def delete_resource_by_resource_id(db: Session, items_user_right: ItemsUserRight) -> None:
+def delete_policies_by_resource_id(
+    db: Session, items_user_right: ItemsUserRight
+) -> None:
+    """used when deleting item"""
     query = db.query(models.CasbinRule).filter(
         and_(
             models.CasbinRule.ptype == PolicyTypeEnum.p,
@@ -129,9 +133,10 @@ def delete_resource_by_resource_id(db: Session, items_user_right: ItemsUserRight
         )
     )
     if items_user_right.right:
+        print("got right here")
         query.filter(models.CasbinRule.v2 == items_user_right.right)
-    db_items = query.all()
-    db.delete(db_items)
+    query.delete()
+    # db.delete(db_items)
 
 
 def delete_specific_policy(db: Session, user_id: str, resource_id: str) -> None:
@@ -140,7 +145,7 @@ def delete_specific_policy(db: Session, user_id: str, resource_id: str) -> None:
         and_(
             models.CasbinRule.ptype == PolicyTypeEnum.p,
             models.CasbinRule.v0 == user_id,
-            models.CasbinRule.v1 == resource_id
+            models.CasbinRule.v1 == resource_id,
         )
     )
     db_items = query.all()
@@ -150,13 +155,18 @@ def delete_specific_policy(db: Session, user_id: str, resource_id: str) -> None:
         raise PolicyDoesNotExist(user_id=user_id, resource_id=resource_id)
 
 
-def update_specific_policy(db: Session, user_id: str, resource_id: str, right_to_update: SpecificResourceRightsEnum) -> None:
+def update_specific_policy(
+    db: Session,
+    user_id: str,
+    resource_id: str,
+    right_to_update: SpecificResourceRightsEnum,
+) -> None:
     """called when update another user's states"""
     query = db.query(models.CasbinRule).filter(
         and_(
             models.CasbinRule.ptype == PolicyTypeEnum.p,
             models.CasbinRule.v0 == user_id,
-            models.CasbinRule.v1 == resource_id
+            models.CasbinRule.v1 == resource_id,
         )
     )
     db_item = query.first()
