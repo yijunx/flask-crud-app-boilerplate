@@ -43,7 +43,7 @@ def create_item(item_create: ItemCreate, user: User) -> Item:
         casbin_policy = CasbinPolicy(
             ptype=PolicyTypeEnum.p,
             v0=user.id,
-            v1=item.id,
+            v1=get_resource_id(item_id=item.id),
             v2=SpecificResourceRightsEnum.own,
             created_at=datetime.now(timezone.utc),
             created_by=user.id,
@@ -59,9 +59,10 @@ def list_items(query_pagination: QueryPagination, user: User) -> ItemWithPaging:
                 db=db,
                 users_item_right=UsersItemRight(user_id=user.id),
                 query_pagination=QueryPagination(size=-1),
+                resource_name=conf.RESOURCE_NAME,
                 is_admin=False,
             )
-            item_ids = [p.v1 for p in policies]
+            item_ids = [get_item_id(resource_id = p.v1) for p in policies]
             db_items, paging = itemRepo.get_all(
                 db=db, query_pagination=query_pagination, item_ids=item_ids
             )
@@ -86,7 +87,7 @@ def delete_item(item_id: str, user: User) -> None:
     with get_db() as db:
         itemRepo.delete(db=db, item_id=item_id)
         casbinruleRepo.delete_resource(
-            db=db, items_user_right=ItemsUserRight(resource_id=item_id)
+            db=db, items_user_right=ItemsUserRight(resource_id=get_resource_id(item_id=item_id))
         )
 
 
@@ -99,21 +100,21 @@ def share_item(item_id: str, user: User, user_share: UserShare) -> None:
         casbin_policy = CasbinPolicy(
             ptype=PolicyTypeEnum.p,
             v0=user_share.user_id,
-            v1=item_id,
+            v1=get_resource_id(item_id=item_id),
             v2=user_share.right,
             created_at=datetime.now(timezone.utc),
             created_by=user.id,
         )
         # there will be error raised in create if duplicated
         casbinruleRepo.create(db=db, casbin_policy=casbin_policy)
-        pass
 
 
 @authorize(action=SpecificResourceActionsEnum.unshare)
 def unshare_item(item_id: str, user: User) -> None:
     with get_db() as db:
-
-        pass
+        casbinruleRepo.delete_specific_policy(
+            db=db, user_id=user.id, resource_id=get_resource_id(item_id=item_id)
+        )
 
 
 def clean_up() -> None:

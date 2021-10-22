@@ -30,7 +30,7 @@ def create(db: Session, casbin_policy: CasbinPolicy) -> models.Item:
         db.flush()
     except IntegrityError:
         db.rollback()
-        raise PolicyIsAlreadyThere()
+        raise PolicyIsAlreadyThere(casbin_policy=casbin_policy)
     return db_item
 
 
@@ -38,16 +38,21 @@ def get_all_policies_given_user(
     db: Session,
     users_item_right: UsersItemRight,
     query_pagination: QueryPagination,
-    is_admin: bool,
+    resource_name: str = None,
+    is_admin: bool = False,
 ) -> Tuple[List[models.CasbinRule], ResponsePagination]:
     """
     Given a user (user_id + optional right),
     return what resource he/she operator at what right
     """
+    # also need to filter by the resource id (need to include the resource name)
+    # because there can be 2 kind of resources...
 
     query = db.query(models.CasbinRule).filter(
         models.CasbinRule.ptype == PolicyTypeEnum.p
     )
+    if resource_name:
+        query = query.filter(models.CasbinRule.v1.ilike(f"%{resource_name}%"))
 
     if is_admin:
         # admin in fact owns everything
@@ -116,11 +121,7 @@ def get_role_ids_of_user(db: Session, user_id: str):
     return db_items
 
 
-def update_resouce_specific_policy(db: Session):
-    return
-
-
-def delete_resource(db: Session, items_user_right: ItemsUserRight) -> None:
+def delete_resource_by_resource_id(db: Session, items_user_right: ItemsUserRight) -> None:
     query = db.query(models.CasbinRule).filter(
         and_(
             models.CasbinRule.ptype == PolicyTypeEnum.p,
@@ -133,15 +134,33 @@ def delete_resource(db: Session, items_user_right: ItemsUserRight) -> None:
     db.delete(db_items)
 
 
-def delete_casbin_policy(db: Session, casbin_policy: CasbinPolicy) -> None:
+def delete_specific_policy(db: Session, user_id: str, resource_id: str) -> None:
+    """called when unshare"""
     query = db.query(models.CasbinRule).filter(
         and_(
             models.CasbinRule.ptype == PolicyTypeEnum.p,
-            models.CasbinRule.v1 == casbin_policy,
+            models.CasbinRule.v0 == user_id,
+            models.CasbinRule.v1 == resource_id
         )
     )
     db_items = query.all()
     if db_items:
         db.delete(db_items)
     else:
-        raise PolicyDoesNotExist(item_id=item_id)
+        raise PolicyDoesNotExist(user_id=user_id, resource_id=resource_id)
+
+
+def update_specific_policy(db: Session, user_id: str, resource_id: str, right_to_update: SpecificResourceRightsEnum) -> None:
+    """called when update another user's states"""
+    query = db.query(models.CasbinRule).filter(
+        and_(
+            models.CasbinRule.ptype == PolicyTypeEnum.p,
+            models.CasbinRule.v0 == user_id,
+            models.CasbinRule.v1 == resource_id
+        )
+    )
+    db_item = query.first()
+    if db_item:
+        db_item.v2 = right_to_update
+    else:
+        raise PolicyDoesNotExist(user_id=user_id, resource_id=resource_id)

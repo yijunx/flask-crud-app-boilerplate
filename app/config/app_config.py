@@ -12,6 +12,9 @@ class Settings(BaseSettings):
     DEFAULT_PAGE_SIZE: int
     CORS_ALLOWED_ORIGINS: str
     ADMIN_ROLE_ID: str
+    RESOURCE_NAME: str = "item/"
+
+    USER_MANAGEMENT_URL: str = "not set up yet"
 
 
 class ProdConfig(Settings):
