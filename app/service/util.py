@@ -24,21 +24,28 @@ def authorize(action: SpecificResourceActionsEnum, admin_required: bool = False)
     Enforces authorization on all service layer with item_id and user.
     The function name must have the pattern <act>_item
     """
+
     @wraps
     def decorator(func):
         @wraps
         def wrapper_enforcer(*args, **kwargs):
-            item_id: str = kwargs['item_id']
-            user: User = kwargs['user']
+            item_id: str = kwargs["item_id"]
+            user: User = kwargs["user"]
             if user.is_admin:  # admin.. so let him go..
                 return func(*args, **kwargs)
             # now user is not admin
             if admin_required:
-                raise NotAuthorized(resource_id=item_id, operation=action, user_id=user.id)
+                raise NotAuthorized(
+                    resource_id=item_id, operation=action, user_id=user.id
+                )
             # now this is not admin only stuff, start the normal casbin
             if casbin_enforcer.enforce(user.id, item_id, action):
                 return func(*args, **kwargs)
             else:
-                raise NotAuthorized(resource_id=item_id, operation=action, user_id=user.id)
+                raise NotAuthorized(
+                    resource_id=item_id, operation=action, user_id=user.id
+                )
+
         return wrapper_enforcer
+
     return decorator

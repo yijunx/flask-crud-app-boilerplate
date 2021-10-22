@@ -80,6 +80,7 @@ def get_item(item_id: str, user: User) -> Item:
         item = Item.from_orm(db_item)
     return item
 
+
 @authorize(action=SpecificResourceActionsEnum.delete)
 def delete_item(item_id: str, user: User) -> None:
     with get_db() as db:
@@ -87,6 +88,7 @@ def delete_item(item_id: str, user: User) -> None:
         casbinruleRepo.delete_resource(
             db=db, items_user_right=ItemsUserRight(resource_id=item_id)
         )
+
 
 @authorize(action=SpecificResourceActionsEnum.share)
 def share_item(item_id: str, user: User, user_share: UserShare) -> None:
@@ -105,6 +107,7 @@ def share_item(item_id: str, user: User, user_share: UserShare) -> None:
         # there will be error raised in create if duplicated
         casbinruleRepo.create(db=db, casbin_policy=casbin_policy)
         pass
+
 
 @authorize(action=SpecificResourceActionsEnum.unshare)
 def unshare_item(item_id: str, user: User) -> None:
