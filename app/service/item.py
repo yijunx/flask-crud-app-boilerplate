@@ -2,7 +2,7 @@ from datetime import datetime, timezone
 from app.db.database import get_db
 from app.schemas.item import Item, ItemCreate, ItemWithPaging, ItemPatch, ItemsUserRight
 from app.schemas.pagination import QueryPagination
-from app.schemas.user import User, UserShare, UsersItemRight
+from app.schemas.user import User, UserShare, UsersItemRight, UsersItemRightWithPaging
 from app.schemas.casbin_rule import CasbinPolicy
 import app.repo.item as itemRepo
 import app.repo.casbin_rule as casbinruleRepo
@@ -62,6 +62,16 @@ def get_item(item_id: str, user: User) -> Item:
     return item
 
 
+@authorize(action=SpecificResourceActionsEnum.patch)
+def patch_item(item_id: str, user: User, item_patch: ItemPatch) -> Item:
+    with get_db() as db:
+        db_item = itemRepo.patch(
+            db=db, item_id=item_id, user=user, item_patch=item_patch
+        )
+        item = Item.from_orm(db_item)
+    return item
+
+
 @authorize(action=SpecificResourceActionsEnum.delete)
 def delete_item(item_id: str, user: User) -> None:
     with get_db() as db:
@@ -98,6 +108,25 @@ def unshare_item(item_id: str, user: User, sharee_id: str) -> None:
         casbinruleRepo.delete_specific_policy(
             db=db, user_id=sharee_id, resource_id=get_resource_id(item_id=item_id)
         )
+
+
+@authorize(action=SpecificResourceActionsEnum.get)
+def list_items_user_rights(
+    item_id: str, user: User, query_pagination: QueryPagination
+) -> UsersItemRightWithPaging:
+    """show who has what right on a given item"""
+    with get_db() as db:
+        policies, paging = casbinruleRepo.get_all_policies_given_item(
+            db=db,
+            items_user_right=ItemsUserRight(
+                resource_id=get_resource_id(item_id=item_id)
+            ),
+            query_pagination=query_pagination,
+        )
+        users_item_rights = [UsersItemRight(user_id=p.v0, right=p.v2) for p in policies]
+        # if there is user table then need to take the user id
+        # to get full info from the user table
+    return UsersItemRightWithPaging(data=users_item_rights, paging=paging)
 
 
 def clean_up() -> None:

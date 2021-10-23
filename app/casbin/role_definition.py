@@ -56,4 +56,3 @@ resource_right_action_mapping: dict = {
         SpecificResourceActionsEnum.delete,
     },
 }
-

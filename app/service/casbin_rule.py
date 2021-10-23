@@ -7,7 +7,6 @@ from app.schemas.user import User, UserShare, UsersItemRight
 from app.schemas.casbin_rule import CasbinPolicy
 import app.repo.item as itemRepo
 import app.repo.casbin_rule as casbinruleRepo
-from app.casbin.rbac import create_casbin_enforcer
 from app.casbin.role_definition import (
     SpecificResourceRightsEnum,
     SpecificResourceActionsEnum,
@@ -15,9 +14,3 @@ from app.casbin.role_definition import (
 )
 from app.service.util import get_resource_id, get_item_id, authorize
 from app.config.app_config import conf
-
-
-casbin_enforcer = create_casbin_enforcer()
-
-
-

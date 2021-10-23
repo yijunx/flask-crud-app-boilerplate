@@ -5,7 +5,7 @@ from app.db.models import models
 from sqlalchemy.orm import Session
 
 # from uuid import uuid4
-from app.schemas.item import ItemCreate
+from app.schemas.item import ItemCreate, ItemPatch
 from app.schemas.user import User
 from uuid import uuid4
 from datetime import datetime, timezone
@@ -47,6 +47,17 @@ def get(db: Session, item_id: str) -> models.Item:
     db_item = db.query(models.Item).filter(models.Item.id == item_id).first()
     if not db_item:
         raise ItemDoesNotExist(item_id=item_id)
+    return db_item
+
+
+def patch(db: Session, item_id: str, item_patch: ItemPatch, user: User) -> models.Item:
+    db_item = db.query(models.Item).filter(models.Item.id == item_id).first()
+    if not db_item:
+        raise ItemDoesNotExist(item_id=item_id)
+    else:
+        db_item.description = item_patch.description
+        # and log the user id, stuff into the db_item,
+        # like last_modified_by, at stuff
     return db_item
 
 

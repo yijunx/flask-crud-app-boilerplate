@@ -2,7 +2,7 @@ from flask import Blueprint, request
 from flask_pydantic import validate
 from app.exceptions.casbin_rule import PolicyDoesNotExist, PolicyIsAlreadyThere
 from app.exceptions.rbac import NotAuthorized
-from app.schemas.item import ItemCreate
+from app.schemas.item import ItemCreate, ItemPatch
 from app.schemas.pagination import QueryPagination
 from app.schemas.user import UserShare
 from app.util.response_util import create_response
@@ -55,6 +55,23 @@ def get_item(item_id: str):
     return create_response(response=r)
 
 
+@bp.route("/<item_id>", methods=["PATCH"])
+@validate()
+def patch_item(item_id: str, body: ItemPatch):
+    user = get_user_info_from_request(request=request)
+    # check casbin here...
+    try:
+        r = itemService.patch_item(item_id=item_id, user=user, item_patch=body)
+    except (ItemDoesNotExist, NotAuthorized) as e:
+        return create_response(
+            success=False, message=e.message, status_code=e.status_code
+        )
+    except Exception as e:
+        logger.debug(e, exc_info=True)
+        return create_response(success=False, message=str(e), status_code=500)
+    return create_response(response=r)
+
+
 @bp.route("/<item_id>", methods=["DELETE"])
 def delete_item(item_id: str):
     user = get_user_info_from_request(request=request)
@@ -91,7 +108,7 @@ def share_item(item_id: str, body: UserShare):
 @bp.route("/<item_id>/sharees", methods=["GET"])
 def list_shares(item_id: str):
     user = get_user_info_from_request(request=request)
-    
+
     pass
 
 
