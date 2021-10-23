@@ -38,14 +38,15 @@ a bash script to create basic flask project with devcontainers, Dockerfile and v
 
 * above methods solves for the specific resource for user group
 * now lets think about the admin group, first need to have a admin role id: `g, user_id_for_user_1, admin_role_1_id`. This indicates user_1 is an admin in the with the role `admin_role_1_id`
-* then we can add policies for admin role: `p, admin_role_1_id, admin_resource, admin_role_1_right`. This policies will need to be there from the beginning (before flask starts). And since we have admin rights, we need to update the resource_right_action_mapping:
+* then we can add policies for admin role: `p, admin_role_1_id, admin_resource, admin_role_1_right`. This policies will need to be there from the beginning (before flask starts). And since we have admin rights, we need to update the resource_right_action_mapping. This mapping is created at flask app starting, which means we can easily change the user's right of certain actions, without updating the database! (because in database there are only rights, there is no actions allowed based on the right given to a user or role)!
 
         resource_right_action_mapping = {
             "right1": {"action1", "action2"},
             "right2": {"action1", "action2", "action3"},
             "right3": {"action1", "action2", "action5", "action5"},
-            "admin_role_1_right": {"admin_action1", "admin_action2"}  # maybe we can take out actionX here if we dont want admin to have such action allowed!!
+            "admin_role_1_right": {"admin_action1", "admin_action2", "action1"}  # maybe we can take out actionX here if we dont want admin to have such action allowed!!
         }
+        # and of course we can have admin_role_2_right...
 
 * then in `enforcer.enforce(admin_user.id, admin_resource, admin_action1)` will allow. The format aligns with `enforcer.enforce(normal_user.id, normal_specific_resource(items/<item_id>), delete)`
 * now we need to let admin_users can do any operations on any resource, we can add an object mapping functions
