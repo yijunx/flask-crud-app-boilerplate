@@ -16,7 +16,7 @@ a bash script to create basic flask project with devcontainers, Dockerfile and v
 # Authorization (casbin)
 * for specific resources `p, user_id, resource_id, right1 | right2 | right3 ...`
 * actions are `action1, action2, action3..` etc, can be very flexible
-* now we need a function to do the match
+* now we need a mapping and a function to do the match. This `resource_right_action_mapping` is created at flask app starting, which means we can easily change the user's right of certain actions, without updating the database! (because in database there are only rights, there is no actions allowed based on the right given to a user or role)! `resource_right_action_mapping` is a dictionary of sets.
     
         resource_right_action_mapping = {
             "right1": {"action1", "action2"},
@@ -38,7 +38,7 @@ a bash script to create basic flask project with devcontainers, Dockerfile and v
 
 * above methods solves for the specific resource for user group
 * now lets think about the admin group, first need to have a admin role id: `g, user_id_for_user_1, admin_role_1_id`. This indicates user_1 is an admin in the with the role `admin_role_1_id`
-* then we can add policies for admin role: `p, admin_role_1_id, admin_resource, admin_role_1_right`. This policies will need to be there from the beginning (before flask starts). And since we have admin rights, we need to update the resource_right_action_mapping. This mapping is created at flask app starting, which means we can easily change the user's right of certain actions, without updating the database! (because in database there are only rights, there is no actions allowed based on the right given to a user or role)!
+* then we can add policies for admin role: `p, admin_role_1_id, admin_resource, admin_role_1_right`. **This policies will need to be there from the beginning (before flask starts, so it can be added via initContainers to seed the database, or use some flask functions before app starts)**. And since we have admin rights, we need to update the resource_right_action_mapping.
 
         resource_right_action_mapping = {
             "right1": {"action1", "action2"},
