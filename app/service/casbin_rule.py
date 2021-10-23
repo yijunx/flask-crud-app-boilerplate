@@ -21,7 +21,7 @@ from app.config.app_config import conf
 # this is internal, receiving instructions from user management!
 # user management will add auth to check
 # whether a user can use the service to call the internal endpoint here
-def add_admin_user(admin_user_id: str, user: User):
+def add_admin(admin_user_id: str, user: User):
     with get_db() as db:
         group_policy = CasbinPolicy(
             ptype=PolicyTypeEnum.g, v0=admin_user_id, v1=conf.ADMIN_ROLE_ID
@@ -29,7 +29,7 @@ def add_admin_user(admin_user_id: str, user: User):
         casbinruleRepo.create(db=db, casbin_policy=group_policy)
 
 
-def delete_admin_user(admin_user_id: str, user: User):
+def delete(admin_user_id: str, user: User):
     with get_db() as db:
         group_policy = CasbinPolicy(
             ptype=PolicyTypeEnum.g, v0=admin_user_id, v1=conf.ADMIN_ROLE_ID
@@ -37,7 +37,7 @@ def delete_admin_user(admin_user_id: str, user: User):
         casbinruleRepo.create(db=db, casbin_policy=group_policy)
 
 
-def get_admin_user(admin_user_id: str, user: User) -> bool:
+def list_admin(admin_user_id: str, user: User) -> bool:
     with get_db() as db:
         group_policy = CasbinPolicy(
             ptype=PolicyTypeEnum.g, v0=admin_user_id, v1=conf.ADMIN_ROLE_ID
@@ -45,9 +45,11 @@ def get_admin_user(admin_user_id: str, user: User) -> bool:
         casbinruleRepo.create(db=db, casbin_policy=group_policy)
 
 
-def list_admin_users(admin_user_id: str, user: User) -> bool:
+def is_admin(user: User):
     with get_db() as db:
-        group_policy = CasbinPolicy(
-            ptype=PolicyTypeEnum.g, v0=admin_user_id, v1=conf.ADMIN_ROLE_ID
+        is_admin = any(
+            x
+            for x in casbinruleRepo.get_role_ids_of_user(db=db, user_id=user.id)
+            if x.v1 == conf.ADMIN_ROLE_ID
         )
-        casbinruleRepo.create(db=db, casbin_policy=group_policy)
+    return is_admin

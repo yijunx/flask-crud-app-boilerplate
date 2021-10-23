@@ -1,6 +1,8 @@
-from flask import Blueprint
+from flask import Blueprint, request
+from app.util.process_request import get_user_info_from_request
 from app.util.response_util import create_response
 from app.util.app_logging import get_logger
+import app.service.casbin_rule as casbinruleService
 
 
 bp = Blueprint("rbac", __name__, url_prefix="/internal/rbac")
@@ -21,7 +23,11 @@ def list_admin_users():
 @bp.route("/admin_user/<user_id>", metjods=["GET"])
 def check_if_its_admin_user(user_id: str):
     # return 404 if not..
-    return
+    user = get_user_info_from_request(request=request)
+    if user.is_admin:
+        return create_response(status_code=200)
+    else:
+        return create_response(status_code=404)
 
 
 @bp.route("/admin_users", methods=["POST"])

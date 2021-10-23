@@ -7,7 +7,7 @@ from flask import Request, abort
 from datetime import datetime, timedelta, timezone
 from typing import List
 from flask import Request, request
-from app.casbin.rbac import casbin_enforcer, is_admin
+from app.service.casbin_rule import is_admin
 from app.util.response_util import create_response
 
 
