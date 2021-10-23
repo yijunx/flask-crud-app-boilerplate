@@ -91,6 +91,7 @@ def share_item(item_id: str, body: UserShare):
 @bp.route("/<item_id>/sharees", methods=["GET"])
 def list_shares(item_id: str):
     user = get_user_info_from_request(request=request)
+    
     pass
 
 

@@ -1,14 +1,11 @@
-from contextlib import contextmanager
 from datetime import datetime, timezone
-from app.db.database import SessionLocal
-from app.exceptions.rbac import NotAuthorized
+from app.db.database import get_db
 from app.schemas.item import Item, ItemCreate, ItemWithPaging, ItemPatch, ItemsUserRight
 from app.schemas.pagination import QueryPagination
 from app.schemas.user import User, UserShare, UsersItemRight
 from app.schemas.casbin_rule import CasbinPolicy
 import app.repo.item as itemRepo
 import app.repo.casbin_rule as casbinruleRepo
-from app.casbin.rbac import create_casbin_enforcer
 from app.casbin.role_definition import (
     SpecificResourceRightsEnum,
     SpecificResourceActionsEnum,
@@ -16,23 +13,6 @@ from app.casbin.role_definition import (
 )
 from app.service.util import get_resource_id, get_item_id, authorize
 from app.config.app_config import conf
-
-
-casbin_enforcer = create_casbin_enforcer()
-
-
-@contextmanager
-def get_db():
-    session = SessionLocal()
-    try:
-        yield session
-        session.commit()
-    except:
-        session.rollback()
-        # can roll other things back here
-        raise
-    finally:
-        session.close()
 
 
 def create_item(item_create: ItemCreate, user: User) -> Item:
