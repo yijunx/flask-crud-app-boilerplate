@@ -1,4 +1,5 @@
 from datetime import datetime, timezone
+import re
 from app.db.database import get_db
 from app.schemas.item import Item, ItemCreate, ItemWithPaging, ItemPatch, ItemsUserRight
 from app.schemas.pagination import QueryPagination
@@ -17,6 +18,7 @@ from app.config.app_config import conf
 
 def create_item(item_create: ItemCreate, user: User) -> Item:
     # here it means every body can post
+    # here we can add decorator to let only admin user can create item...
     with get_db() as db:
         db_item = itemRepo.create(db=db, item_create=item_create, creator=user)
         item = Item.from_orm(db_item)
@@ -102,6 +104,19 @@ def share_item(item_id: str, user: User, user_share: UserShare) -> None:
         casbinruleRepo.create(db=db, casbin_policy=casbin_policy)
 
 
+@authorize(action=SpecificResourceActionsEnum.share)
+def patch_user_rights_of_an_item(
+    item_id: str, user: User, user_share: UserShare
+) -> None:
+    with get_db() as db:
+        casbinruleRepo.update_specific_policy(
+            db=db,
+            resource_id=get_resource_id(item_id=item_id),
+            user_id=user_share.user_id,
+            right_to_update=user_share.right,
+        )
+
+
 @authorize(action=SpecificResourceActionsEnum.unshare)
 def unshare_item(item_id: str, user: User, sharee_id: str) -> None:
     with get_db() as db:
@@ -127,6 +142,12 @@ def list_items_user_rights(
         # if there is user table then need to take the user id
         # to get full info from the user table
     return UsersItemRightWithPaging(data=users_item_rights, paging=paging)
+
+
+@authorize(admin_required=True)
+def admin_only_action(item_id: str, user: User):
+    # this is only for admin
+    return {"hello": item_id, "i am": user.id}
 
 
 def clean_up() -> None:

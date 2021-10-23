@@ -18,6 +18,12 @@ def list_admin_users():
     return "not yet"
 
 
+@bp.route("/admin_user/<user_id>", metjods=["GET"])
+def check_if_its_admin_user(user_id: str):
+    # return 404 if not..
+    return
+
+
 @bp.route("/admin_users", methods=["POST"])
 def add_admin_user():
     # need to check if this is comming from a user admin..

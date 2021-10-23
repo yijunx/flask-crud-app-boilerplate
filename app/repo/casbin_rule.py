@@ -13,7 +13,7 @@ from sqlalchemy.exc import IntegrityError
 from app.exceptions.casbin_rule import PolicyDoesNotExist, PolicyIsAlreadyThere
 
 
-def create(db: Session, casbin_policy: CasbinPolicy) -> models.Item:
+def create(db: Session, casbin_policy: CasbinPolicy) -> models.CasbinRule:
     """Create both g type and p type here"""
     db_item = models.CasbinRule(
         ptype=casbin_policy.ptype,

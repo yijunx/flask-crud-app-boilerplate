@@ -106,10 +106,21 @@ def share_item(item_id: str, body: UserShare):
 
 
 @bp.route("/<item_id>/sharees", methods=["GET"])
-def list_shares(item_id: str):
+@validate()
+def list_shares(item_id: str, query: QueryPagination):
     user = get_user_info_from_request(request=request)
-
-    pass
+    try:
+        r = itemService.list_items_user_rights(
+            item_id=item_id, user=user, query_pagination=query
+        )
+    except (NotAuthorized,) as e:
+        return create_response(
+            success=False, message=e.message, status_code=e.status_code
+        )
+    except Exception as e:
+        logger.error(e, exc_info=True)
+        return create_response(success=False, message=str(e), status_code=500)
+    return create_response(response=r)
 
 
 @bp.route("/<item_id>/sharees/<sharee_id>", methods=["DELETE"])
@@ -128,9 +139,18 @@ def unshare_item(item_id: str, sharee_id: str):
 
 
 @bp.route("/<item_id>/sharees/<sharee_id>", methods=["PATCH"])
-def update_item_sharing_info(item_id: str, sharee_id: str):
+@validate()
+def update_item_sharing_info(item_id: str, body: UserShare):
     user = get_user_info_from_request(request=request)
-    # check casbin here...
-    # always need to pass the user because need to ask casbin for auth
-    _ = itemService.delete_item(item_id=item_id, user=user)
-    return create_response(message="sharee updated")
+    try:
+        itemService.patch_user_rights_of_an_item(
+            item_id=item_id, user=user, user_share=body
+        )
+    except (ItemDoesNotExist, NotAuthorized, PolicyDoesNotExist) as e:
+        return create_response(
+            success=False, message=e.message, status_code=e.status_code
+        )
+    except Exception as e:
+        logger.error(e, exc_info=True)
+        return create_response(success=False, message=str(e), status_code=500)
+    return create_response(message="sharee's rights updated")
