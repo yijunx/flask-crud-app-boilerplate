@@ -1,5 +1,5 @@
 class NotAuthorized(Exception):
-    def __init__(self, resource_id: str, operation: str, user_id: str) -> None:
+    def __init__(self, resource_id: str, action: str, user_id: str) -> None:
         self.status_code = 403
-        self.message = "Not authorized"
+        self.message = f"Not authorized. user: {user_id}, resource_id: {resource_id}, action: {action}"
         super().__init__(self.message)

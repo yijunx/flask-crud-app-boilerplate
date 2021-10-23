@@ -113,10 +113,10 @@ def share_item(item_id: str, user: User, user_share: UserShare) -> None:
 
 
 @authorize(action=SpecificResourceActionsEnum.unshare)
-def unshare_item(item_id: str, user: User) -> None:
+def unshare_item(item_id: str, user: User, sharee_id: str) -> None:
     with get_db() as db:
         casbinruleRepo.delete_specific_policy(
-            db=db, user_id=user.id, resource_id=get_resource_id(item_id=item_id)
+            db=db, user_id=sharee_id, resource_id=get_resource_id(item_id=item_id)
         )
 
 

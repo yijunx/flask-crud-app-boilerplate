@@ -35,6 +35,8 @@ class SpecificResourceActionsEnum(str, Enum):
 
 
 # this is dynamic
+# this is make sure that, own covers edit, edit covers view
+# this also supports other relations, very customization
 resource_right_action_mapping: dict = {
     SpecificResourceRightsEnum.view: {
         SpecificResourceActionsEnum.get,
@@ -55,16 +57,3 @@ resource_right_action_mapping: dict = {
     },
 }
 
-
-# class ViewActionsEnum(Enum):
-#     get = "get"
-
-
-# class EditActionsEnum(Enum):
-#     patch = "patch"
-
-
-# class OwnActionsEnum(Enum):
-#     delete = "delete"
-#     share = "share"
-#     unshare = "unshare"

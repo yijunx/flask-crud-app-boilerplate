@@ -1,5 +1,6 @@
 from flask import Blueprint, request
 from flask_pydantic import validate
+from app.exceptions.casbin_rule import PolicyDoesNotExist, PolicyIsAlreadyThere
 from app.exceptions.rbac import NotAuthorized
 from app.schemas.item import ItemCreate
 from app.schemas.pagination import QueryPagination
@@ -72,39 +73,40 @@ def delete_item(item_id: str):
 
 
 @bp.route("/<item_id>/sharees", methods=["POST"])
-@validate
+@validate()
 def share_item(item_id: str, body: UserShare):
     user = get_user_info_from_request(request=request)
-    # check casbin here...
-    # always need to pass the user because need to ask casbin for auth
     try:
         itemService.share_item(item_id=item_id, user=user, user_share=body)
-    except (ItemDoesNotExist, NotAuthorized) as e:
+    except (ItemDoesNotExist, NotAuthorized, PolicyIsAlreadyThere) as e:
         return create_response(
             success=False, message=e.message, status_code=e.status_code
         )
     except Exception as e:
         logger.error(e, exc_info=True)
         return create_response(success=False, message=str(e), status_code=500)
-    return create_response(message="item deleted")
+    return create_response(message="item shared")
 
 
 @bp.route("/<item_id>/sharees", methods=["GET"])
 def list_shares(item_id: str):
     user = get_user_info_from_request(request=request)
-    # check casbin here...
-    # always need to pass the user because need to ask casbin for auth
-    _ = itemService.delete_item(item_id=item_id, user=user)
-    return create_response(message="item deleted")
+    pass
 
 
 @bp.route("/<item_id>/sharees/<sharee_id>", methods=["DELETE"])
 def unshare_item(item_id: str, sharee_id: str):
     user = get_user_info_from_request(request=request)
-    # check casbin here...
-    # always need to pass the user because need to ask casbin for auth
-    _ = itemService.delete_item(item_id=item_id, user=user)
-    return create_response(message="item deleted")
+    try:
+        itemService.unshare_item(item_id=item_id, user=user, sharee_id=sharee_id)
+    except (ItemDoesNotExist, NotAuthorized, PolicyDoesNotExist) as e:
+        return create_response(
+            success=False, message=e.message, status_code=e.status_code
+        )
+    except Exception as e:
+        logger.error(e, exc_info=True)
+        return create_response(success=False, message=str(e), status_code=500)
+    return create_response(message="sharee deleted")
 
 
 @bp.route("/<item_id>/sharees/<sharee_id>", methods=["PATCH"])
@@ -113,4 +115,4 @@ def update_item_sharing_info(item_id: str, sharee_id: str):
     # check casbin here...
     # always need to pass the user because need to ask casbin for auth
     _ = itemService.delete_item(item_id=item_id, user=user)
-    return create_response(message="item deleted")
+    return create_response(message="sharee updated")

@@ -46,7 +46,10 @@ def decode_token(token: str):
     # [if RS256]
     # pub = _read_pem(file_location=PUBLIC_KEY_LOCATION)
     # data = jwt.decode(jwt=token, key=pub, algorithms=["RS256"])
-    data = jwt.decode(jwt=token, options={"verify_signature": False})
+    try:
+        data = jwt.decode(jwt=token, options={"verify_signature": False})
+    except:
+        abort(401, "Decode token error!")
     return data
 
 
@@ -71,7 +74,7 @@ def get_user_info_from_request(request: Request) -> User:
     """
     token = get_token_from_cookie(request)
     if token is None:
-        abort(status=401)
+        abort(401, "no token!!!")
     else:
         user = User(**decode_token(token=token))
         user.is_admin = is_admin(user)

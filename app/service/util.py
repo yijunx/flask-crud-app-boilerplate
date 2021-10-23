@@ -23,6 +23,9 @@ def authorize(action: SpecificResourceActionsEnum, admin_required: bool = False)
     """
     Enforces authorization on all service layer with item_id and user.
     The function name must have the pattern <act>_item
+
+    This decorator is not used on flask endpoints because it can be decoupled with
+    the request path. (it does not nessisarily needs to take user/item id from request)
     """
 
     def decorator(func):
@@ -31,12 +34,12 @@ def authorize(action: SpecificResourceActionsEnum, admin_required: bool = False)
             resource_id: str = get_resource_id(item_id)
             user: User = kwargs["user"]
             if user.is_admin:  # admin.. so let him go..
-                print("casbin allows it because he is admin!")
+                print("casbin allows it because he/she is admin!")
                 return func(*args, **kwargs)
             # now user is not admin
             if admin_required:
                 raise NotAuthorized(
-                    resource_id=resource_id, operation=action, user_id=user.id
+                    resource_id=resource_id, action=action, user_id=user.id
                 )
             # now this is not admin only stuff, start the normal casbin
             if casbin_enforcer.enforce(user.id, resource_id, action):
@@ -44,7 +47,7 @@ def authorize(action: SpecificResourceActionsEnum, admin_required: bool = False)
                 return func(*args, **kwargs)
             else:
                 raise NotAuthorized(
-                    resource_id=item_id, operation=action, user_id=user.id
+                    resource_id=item_id, action=action, user_id=user.id
                 )
 
         return wrapper_enforcer

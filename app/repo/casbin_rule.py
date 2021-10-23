@@ -150,7 +150,7 @@ def delete_specific_policy(db: Session, user_id: str, resource_id: str) -> None:
     )
     db_items = query.all()
     if db_items:
-        db.delete(db_items)
+        query.delete()
     else:
         raise PolicyDoesNotExist(user_id=user_id, resource_id=resource_id)
 
