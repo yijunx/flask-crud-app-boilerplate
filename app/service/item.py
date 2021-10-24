@@ -1,5 +1,4 @@
 from datetime import datetime, timezone
-import re
 from app.db.database import get_db
 from app.schemas.item import Item, ItemCreate, ItemWithPaging, ItemPatch, ItemsUserRight
 from app.schemas.pagination import QueryPagination
