@@ -20,7 +20,7 @@ def list_admin_users():
     return "not yet"
 
 
-@bp.route("/admin_user/<user_id>", metjods=["GET"])
+@bp.route("/admin_user/<user_id>", methods=["GET"])
 def check_if_its_admin_user(user_id: str):
     # return 404 if not..
     user = get_user_info_from_request(request=request)

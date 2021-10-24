@@ -1,11 +1,9 @@
 from functools import wraps, partial
-from app.casbin.rbac import create_casbin_enforcer
+from app.casbin.rbac import casbin_enforcer
 from app.exceptions.rbac import NotAuthorized, NotAuthorizedAdminOnly
 from app.schemas.user import User
 from app.casbin.role_definition import SpecificResourceActionsEnum
 from app.config.app_config import conf
-
-casbin_enforcer = create_casbin_enforcer()
 
 
 def get_resource_id(item_id: str) -> str:
