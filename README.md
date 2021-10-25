@@ -38,7 +38,7 @@ a bash script to create basic flask project with devcontainers, Dockerfile and v
 
 * above methods solves for the specific resource for user group
 * now lets think about the admin group, first need to have a admin role id: `g, user_id_for_user_1, admin_role_1_id`. This indicates user_1 is an admin in the with the role `admin_role_1_id`
-* then we can add policies for admin role: `p, admin_role_1_id, admin_resource, admin_role_1_right`. **This policies will need to be there from the beginning (before flask starts, so it can be added via initContainers to seed the database, or use some flask functions before app starts)**. And since we have admin rights, we need to update the resource_right_action_mapping.
+* then we can add policies for admin role: `p, admin_role_1_id, *, admin_role_1_right`. It means users with admin role 1 has admin_role_1_right on ALL objects. **This policies will need to be there from the beginning (before flask starts, so it can be added via initContainers to seed the database, or use some flask functions before app starts)**. And since we have admin rights, we need to update the resource_right_action_mapping.
 
         resource_right_action_mapping = {
             "right1": {"action1", "action2"},
@@ -56,7 +56,7 @@ a bash script to create basic flask project with devcontainers, Dockerfile and v
             admin users will have * in obj in the admin role policy, so admin user can
             do things on any resource
             """
-            if object_from_policy == "*":
+            if object_from_policy == "*":  # admin_resource is "*"
                 return True
             else:
                 return object_from_request == object_from_policy
