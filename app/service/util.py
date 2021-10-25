@@ -1,5 +1,5 @@
 from functools import wraps, partial
-from app.casbin.rbac import casbin_enforcer
+from app.casbin.enforcer import casbin_enforcer
 from app.exceptions.rbac import NotAuthorized, NotAuthorizedAdminOnly
 from app.schemas.user import User
 from app.casbin.role_definition import SpecificResourceActionsEnum
@@ -32,22 +32,15 @@ def authorize(action: SpecificResourceActionsEnum = None, admin_required: bool =
         def wrapper_enforcer(*args, **kwargs):
             user: User = kwargs["user"]
             # now user is not admin
-            if admin_required:
-                if user.is_admin:  # admin.. so let him go..
-                    print("casbin allows it because he/she is admin!")
-                    return func(*args, **kwargs)
-                else:
-                    raise NotAuthorizedAdminOnly(user_id=user.id)
-            else:  # not admin_required
-                item_id: str = kwargs["item_id"]
-                resource_id: str = get_resource_id(item_id)
-                if casbin_enforcer.enforce(user.id, resource_id, action):
-                    print("casbin allows it..!")
-                    return func(*args, **kwargs)
-                else:
-                    raise NotAuthorized(
-                        resource_id=item_id, action=action, user_id=user.id
-                    )
+            item_id: str = kwargs["item_id"]
+            resource_id: str = get_resource_id(item_id)
+            if casbin_enforcer.enforce(user.id, resource_id, action):
+                print("casbin allows it..!")
+                return func(*args, **kwargs)
+            else:
+                raise NotAuthorized(
+                    resource_id=item_id, action=action, user_id=user.id
+                )
 
         return wrapper_enforcer
 
