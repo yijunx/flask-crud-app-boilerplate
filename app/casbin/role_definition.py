@@ -18,7 +18,13 @@ class SpecificResourceRightsEnum(str, Enum):
 
 
 class ResourceActionsEnum(str, Enum):
-    """actions to happen on resource/ without id"""
+    """
+    actions to happen on resource/ without id
+    p, admin_role_id, items/, admin_right <- needs to be added beforehand
+    where items/ is the generic resource name
+
+    enable this if only admin can create/get_all item
+    """
 
     get_all = "get_all"
     create = "create"
@@ -27,14 +33,16 @@ class ResourceActionsEnum(str, Enum):
 class SpecificResourceActionsEnum(str, Enum):
     """these are the actions to happen on a resource/resource_id"""
 
+    # on item/item_id
     get = "get"
     download = "download"
     patch = "patch"
     share = "share"
     unshare = "unshare"
     delete = "delete"
-
     lock = "lock"  # lock item from being edited
+
+    # on users/user_id
     ban = "ban"    # ban user from this service
     unban = "unban" # unban
 
@@ -63,6 +71,8 @@ resource_right_action_mapping: dict = {
         SpecificResourceActionsEnum.delete,
     },
     SpecificResourceRightsEnum.admin_right: {
+        # admin can do these on normal specific resources
+        # comment away some actions to disallow admin to do that
         SpecificResourceActionsEnum.get,
         SpecificResourceActionsEnum.download,
         SpecificResourceActionsEnum.patch,
