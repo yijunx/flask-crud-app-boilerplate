@@ -14,6 +14,7 @@ class SpecificResourceRightsEnum(str, Enum):
     view = "view"  # user is viewer
     edit = "edit"  # user is editor
     own = "own"  # user is owner
+    admin_right = "admin_right"
 
 
 class ResourceActionsEnum(str, Enum):
@@ -33,6 +34,10 @@ class SpecificResourceActionsEnum(str, Enum):
     unshare = "unshare"
     delete = "delete"
 
+    lock = "lock"  # lock item from being edited
+    ban = "ban"    # ban user from this service
+    unban = "unban" # unban
+
 
 # this is dynamic
 # this is make sure that, own covers edit, edit covers view
@@ -45,14 +50,28 @@ resource_right_action_mapping: dict = {
     SpecificResourceRightsEnum.edit: {
         SpecificResourceActionsEnum.get,
         SpecificResourceActionsEnum.download,
+        # edit only
         SpecificResourceActionsEnum.patch,
     },
     SpecificResourceRightsEnum.own: {
         SpecificResourceActionsEnum.get,
         SpecificResourceActionsEnum.download,
         SpecificResourceActionsEnum.patch,
+        # own only
         SpecificResourceActionsEnum.share,
         SpecificResourceActionsEnum.unshare,
         SpecificResourceActionsEnum.delete,
     },
+    SpecificResourceRightsEnum.admin_right: {
+        SpecificResourceActionsEnum.get,
+        SpecificResourceActionsEnum.download,
+        SpecificResourceActionsEnum.patch,
+        SpecificResourceActionsEnum.share,
+        SpecificResourceActionsEnum.unshare,
+        SpecificResourceActionsEnum.delete,
+        # admin only
+        SpecificResourceActionsEnum.lock,
+        SpecificResourceActionsEnum.ban,
+        SpecificResourceActionsEnum.unban
+    }
 }
